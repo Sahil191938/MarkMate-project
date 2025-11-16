@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mark Mate — Login</title>
+	<link rel="stylesheet" href="style.css">
+	<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+		<symbol id="mm-logo" viewBox="0 0 24 24"><path d="M12 2L3 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="white" opacity="0.9"/><path d="M10 12l1.5 1.5 3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+		<symbol id="mm-student" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0Z"/></symbol>
+		<symbol id="mm-teacher" viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="10" rx="2"/><circle cx="19" cy="18" r="2"/><path d="M17 18h4" stroke="currentColor" stroke-width="2"/></symbol>
+		<symbol id="mm-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+	</svg>
+	<style>
+		body{display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}
+		.login-container{max-width:420px;width:100%;padding:24px}
+		.login-card{background:var(--color-surface);border:1px solid var(--border);border-radius:16px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.1)}
+		.login-header{text-align:center;margin-bottom:24px}
+		.login-header .logo{width:64px;height:64px;margin:0 auto 16px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,var(--color-primary-strong), var(--color-primary))}
+		.login-header .logo span{font-size:32px}
+		.login-header h1{margin:0;font-size:24px;color:var(--color-text)}
+		.login-header p{color:var(--color-muted);margin:8px 0 0}
+		.form-group{margin-bottom:16px}
+		.form-group label{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:500;color:var(--color-text);font-size:14px}
+		.form-group label::before{content:attr(data-icon);font-size:16px}
+		.form-group select, .form-group input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--color-bg);color:var(--color-text);box-sizing:border-box;font-size:14px}
+		.form-group select:focus, .form-group input:focus{outline:none;border-color:var(--color-primary-strong);box-shadow:0 0 0 3px rgba(31,111,235,0.1)}
+		.btn-login{width:100%;padding:12px;border-radius:8px;border:none;background:var(--color-primary-strong);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+		.btn-login::before{content:"🔐";font-size:16px}
+		.btn-login:hover{background:#f80000}
+		.error{color:var(--color-accent);margin-top:8px;font-size:14px;display:none}
+		.error.show{display:block}
+	</style>
+</head>
+<body>
+	<div class="login-container">
+		<div class="login-card">
+			<div class="login-header">
+				<div class="logo"><img src="cu-logo.png" alt="Logo" style="height:64px;width:auto"></div>
+				<h1>Mark Mate</h1>
+				<p>Sign in to access your dashboard</p>
+			</div>
+			<form id="loginForm">
+				<div class="form-group">
+					<label for="roleSelect" class="with-icon"><svg class="icon"><use href="#mm-student"/></svg> Select Role</label>
+					<select id="roleSelect" required>
+						<option value="">-- Choose Role --</option>
+						<option value="student">Student</option>
+						<option value="teacher">Teacher</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label class="with-icon"><svg class="icon"><use href="#mm-student"/></svg> User Selection</label>
+					<div style="display:flex;gap:16px;margin-bottom:8px">
+						<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:normal">
+							<input type="radio" name="userMode" value="select" checked id="modeSelect" />
+							Select from list
+						</label>
+						<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:normal">
+							<input type="radio" name="userMode" value="manual" id="modeManual" />
+							Enter ID manually
+						</label>
+					</div>
+					<select id="userSelect" required>
+						<option value="">-- Select User --</option>
+					</select>
+					<input type="number" id="userIdInput" placeholder="Enter User ID" disabled style="display:none;width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--color-bg);color:var(--color-text);box-sizing:border-box;font-size:14px" />
+				</div>
+				<div class="form-group">
+					<label for="passwordInput" class="with-icon"><svg class="icon"><use href="#mm-lock"/></svg> Password</label>
+					<input type="password" id="passwordInput" placeholder="Enter password" required />
+					<div class="error" id="errorMsg">Invalid credentials. Please try again.</div>
+				</div>
+				<button type="submit" class="btn-login with-icon"><svg class="icon"><use href="#mm-lock"/></svg> Sign In</button>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		const API_BASE = (location.protocol === 'file:') ? 'http://localhost:3000' : '';
+		const api = async (p, opt={}) => {
+			try {
+				const response = await fetch(`${API_BASE}${p}`, opt);
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				return await response.json();
+			} catch (error) {
+				console.error('API Error:', error);
+				throw error;
+			}
+		};
+		
+		// Redirect if already logged in
+		const authUserId = localStorage.getItem('auth_user_id');
+		const authRole = localStorage.getItem('auth_role');
+		if (authUserId && authRole) {
+			if (authRole === 'student') {
+				window.location.href = 'student.html';
+			} else if (authRole === 'teacher') {
+				window.location.href = 'teacher.html';
+			}
+		}
+		
+		const roleSelect = document.getElementById('roleSelect');
+		const userSelect = document.getElementById('userSelect');
+		const userIdInput = document.getElementById('userIdInput');
+		const modeSelect = document.getElementById('modeSelect');
+		const modeManual = document.getElementById('modeManual');
+		const passwordInput = document.getElementById('passwordInput');
+		const loginForm = document.getElementById('loginForm');
+		const errorMsg = document.getElementById('errorMsg');
+		
+		// Toggle between select and manual input
+		modeSelect.addEventListener('change', () => {
+			if (modeSelect.checked) {
+				userSelect.style.display = 'block';
+				userIdInput.style.display = 'none';
+				userIdInput.removeAttribute('required');
+				userIdInput.disabled = true;
+				userIdInput.value = '';
+				userSelect.setAttribute('required', 'required');
+				// If role is already selected, load users
+				if (roleSelect.value) {
+					roleSelect.dispatchEvent(new Event('change'));
+				}
+			}
+		});
+		
+		modeManual.addEventListener('change', () => {
+			if (modeManual.checked) {
+				userSelect.style.display = 'none';
+				userIdInput.style.display = 'block';
+				userSelect.removeAttribute('required');
+				userSelect.disabled = true;
+				userSelect.value = '';
+				userIdInput.setAttribute('required', 'required');
+				// Enable manual input if role is already selected
+				if (roleSelect.value) {
+					userIdInput.disabled = false;
+				}
+			}
+		});
+
+		roleSelect.addEventListener('change', async () => {
+			const role = roleSelect.value;
+			if (!role) {
+				userSelect.disabled = true;
+				userIdInput.disabled = true;
+				userSelect.innerHTML = '<option value="">-- Select User --</option>';
+				errorMsg.classList.remove('show');
+				return;
+			}
+			
+			// Enable manual input if in manual mode
+			if (modeManual.checked) {
+				userIdInput.disabled = false;
+			}
+			
+			// Only load users if in select mode
+			if (modeSelect.checked) {
+				try {
+					userSelect.disabled = true;
+					userSelect.innerHTML = '<option value="">Loading users...</option>';
+					errorMsg.classList.remove('show');
+					
+					const users = await api(`/api/users?role=${role}`);
+					
+					if (!users || users.length === 0) {
+						userSelect.innerHTML = '<option value="">No users found</option>';
+						errorMsg.textContent = `No ${role}s found. Please contact administrator.`;
+						errorMsg.classList.add('show');
+						return;
+					}
+					
+					userSelect.disabled = false;
+					userSelect.innerHTML = '<option value="">-- Select User --</option>' +
+						users.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+				} catch (e) {
+					console.error('Failed to load users:', e);
+					userSelect.innerHTML = '<option value="">Error loading users</option>';
+					errorMsg.textContent = 'Failed to load users. Please check if server is running.';
+					errorMsg.classList.add('show');
+				}
+			}
+		});
+
+		loginForm.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			errorMsg.classList.remove('show');
+			
+			// Get user ID from either select or manual input
+			const userId = modeManual.checked ? userIdInput.value : userSelect.value;
+			const password = passwordInput.value;
+			const role = roleSelect.value;
+
+			if (!userId || !password || !role) {
+				errorMsg.textContent = 'Please fill in all fields';
+				errorMsg.classList.add('show');
+				return;
+			}
+
+			try {
+				const response = await fetch(`${API_BASE}/api/auth/login`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({ user_id: userId, password: password, role: role })
+				});
+
+				const result = await response.json();
+				
+				if (response.ok && result.success) {
+					localStorage.setItem('auth_user_id', userId);
+					localStorage.setItem('auth_role', role);
+					localStorage.setItem('auth_name', result.name);
+					localStorage.setItem('auth_session_id', result.sessionId);
+					
+					if (role === 'student') {
+						window.location.href = 'student.html';
+					} else {
+						window.location.href = 'teacher.html';
+					}
+				} else {
+					errorMsg.textContent = result.error || 'Login failed';
+					errorMsg.classList.add('show');
+				}
+			} catch (e) {
+				console.error('Login error:', e);
+				errorMsg.textContent = 'Connection error. Please try again.';
+				errorMsg.classList.add('show');
+			}
+		});
+	</script>
+</body>
+</html>
+

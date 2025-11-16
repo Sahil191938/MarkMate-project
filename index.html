@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Mate</title>
+    <link rel="stylesheet" href="style.css">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="mm-logo" viewBox="0 0 24 24"><path d="M12 2L3 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="white" opacity="0.9"/><path d="M10 12l1.5 1.5 3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+        <symbol id="mm-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"/></symbol>
+        <symbol id="mm-student" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0Z"/></symbol>
+        <symbol id="mm-teacher" viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="10" rx="2"/><circle cx="19" cy="18" r="2"/><path d="M17 18h4" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="mm-logout" viewBox="0 0 24 24"><path d="M15 12H4" stroke="currentColor" stroke-width="2"/><path d="M11 8l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    </svg>
+    <style>
+        .container{max-width:960px;margin:40px auto;padding:24px}
+        .card{background:var(--color-surface);border:1px solid var(--border);border-radius:12px;padding:24px;box-shadow:var(--shadow)}
+        h1{margin:0 0 16px;font-size:28px}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .note{color:var(--color-muted);margin-top:8px}
+    </style>
+</head>
+<body>
+    <div class="headerbar">
+        <div class="headerbar-inner">
+            <div class="brand">
+                <div class="logo"><img src="cu-logo.png" alt="Logo"></div>
+                <div>Mark Mate</div>
+            </div>
+            <div class="nav">
+                <a href="login.html" class="with-icon"><svg class="icon"><use href="#mm-student"/></svg> Students</a>
+                <a href="login.html" class="with-icon"><svg class="icon"><use href="#mm-teacher"/></svg> Teachers</a>
+            </div>
+        </div>
+    </div>
+
+	<div class="container">
+		<div class="card">
+            <h1 style="display:flex;align-items:center;gap:10px;margin:0 0 12px"><svg class="icon icon-24"><use href="#mm-home"/></svg> Welcome to Mark Mate</h1>
+			<p class="note">Please sign in to access your dashboard.</p>
+			<div class="grid">
+                <a class="btn with-icon" href="login.html"><svg class="icon"><use href="#mm-student"/></svg> Student Login</a>
+                <a class="btn secondary with-icon" href="login.html"><svg class="icon"><use href="#mm-teacher"/></svg> Teacher Login</a>
+			</div>
+			<div style="margin-top:16px">
+				<span class="badge accent">Secure</span>
+				<span class="note">All users must authenticate to access their accounts</span>
+			</div>
+		</div>
+	</div>
+
+    <div class="footerbar">© <span id="yr"></span> Mark Mate. All rights reserved.</div>
+    <script>
+        document.getElementById('yr').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

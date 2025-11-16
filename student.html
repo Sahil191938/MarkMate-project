@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mark Mate — Student Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="mm-logo" viewBox="0 0 24 24"><path d="M12 2L3 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="white" opacity="0.9"/><path d="M10 12l1.5 1.5 3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+        <symbol id="mm-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"/></symbol>
+        <symbol id="mm-student" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0Z"/></symbol>
+        <symbol id="mm-teacher" viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="10" rx="2"/><circle cx="19" cy="18" r="2"/><path d="M17 18h4" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="mm-logout" viewBox="0 0 24 24"><path d="M15 12H4" stroke="currentColor" stroke-width="2"/><path d="M11 8l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+        <symbol id="mm-profile" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0Z"/></symbol>
+        <symbol id="mm-assign" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3" fill="#000"/></symbol>
+        <symbol id="mm-marks" viewBox="0 0 24 24"><rect x="4" y="12" width="3" height="8"/><rect x="10" y="8" width="3" height="12"/><rect x="16" y="5" width="3" height="15"/></symbol>
+        <symbol id="mm-timetable" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="mm-upload" viewBox="0 0 24 24"><path d="M12 16V7" stroke="currentColor" stroke-width="2"/><path d="M8 10l4-4 4 4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M4 20h16" stroke="currentColor" stroke-width="2"/></symbol>
+    </svg>
+    <style>
+        .container{max-width:1100px;margin:24px auto;padding:24px}
+        .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+        .card{background:var(--color-surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:12px 0;box-shadow:var(--shadow)}
+        .flex{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    </style>
+</head>
+<body>
+    <div class="headerbar">
+        <div class="headerbar-inner">
+            <div class="brand">
+                <div class="logo"><img src="cu-logo.png" alt="Logo"></div>
+                <div>Mark Mate</div>
+            </div>
+            <div class="nav">
+                <a href="index.html" class="with-icon"><svg class="icon"><use href="#mm-home"/></svg> Home</a>
+                <a href="teacher.html" class="with-icon"><svg class="icon"><use href="#mm-teacher"/></svg> Teacher</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h2>Student Dashboard <span class="badge accent">Student</span></h2>
+            <div class="flex">
+                <label for="studentSelect" class="with-icon"><svg class="icon"><use href="#mm-student"/></svg> Student:</label>
+                <select id="studentSelect"></select>
+                <span class="badge accent" id="welcomeBadge" style="display:inline-flex;align-items:center;gap:6px"><svg class="icon"><use href="#mm-home"/></svg> Welcome, <span id="userName"></span></span>
+                <button class="btn ghost with-icon" onclick="logout()"><svg class="icon"><use href="#mm-logout"/></svg> Logout</button>
+            </div>
+		</div>
+        <div class="layout">
+            <div class="main">
+        <div class="card" id="profileCard">
+            <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-profile"/></svg> Profile</h3>
+            <div style="display:flex;align-items:center;gap:16px">
+                <img id="studentPhoto" src="" alt="No photo" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--color-primary);display:none;background:#f0f0f0" />
+                <div id="profileDetails" class="flex"></div>
+            </div>
+        </div>
+
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-assign"/></svg> Assignments</h3>
+                    <table id="assignmentsTable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Due</th>
+                                <th>Teacher</th>
+                                <th>Upload</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-marks"/></svg> Marks</h3>
+                    <table id="marksTable">
+                        <thead>
+                            <tr><th>Assignment</th><th>Due</th><th>Submitted</th><th>Marks</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-timetable"/></svg> Time Table</h3>
+                    <table id="timetableTable">
+                        <thead><tr><th>Day</th><th>Period</th><th>Subject</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="timetablePdf" style="margin-top:8px"></div>
+                </div>
+            </div>
+            <aside class="sidebar">
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-home"/></svg> Attendance</h3>
+                    <table id="attendanceTable">
+                        <thead><tr><th>Date</th><th>Status</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="footerbar">Need help? Contact the office • © <span id="yr"></span></div>
+
+	<script>
+		const API_BASE = (location.protocol === 'file:') ? 'http://localhost:3000' : '';
+		const api = (p, opt={}) => fetch(`${API_BASE}${p}`, opt).then(r => r.json());
+		
+		// Check authentication
+		const authUserId = localStorage.getItem('auth_user_id');
+		const authRole = localStorage.getItem('auth_role');
+		const authName = localStorage.getItem('auth_name');
+		
+		if (!authUserId || authRole !== 'student') {
+			window.location.href = 'login.html';
+		}
+		
+		const studentSelect = document.getElementById('studentSelect');
+		let currentStudentId = authUserId;
+
+		// Set authenticated user and hide dropdown
+		studentSelect.style.display = 'none';
+		document.querySelector('label[for="studentSelect"]').style.display = 'none';
+		
+		async function loadStudents() {
+			// Load all students for reference, but use authenticated user
+			const students = await api('/api/users?role=student');
+			currentStudentId = authUserId;
+			refreshAll();
+		}
+
+		studentSelect.addEventListener('change', () => {
+			currentStudentId = studentSelect.value;
+			refreshAll();
+		});
+		
+		// Logout function
+		async function logout() {
+			localStorage.removeItem('auth_user_id');
+			localStorage.removeItem('auth_role');
+			localStorage.removeItem('auth_name');
+			window.location.href = 'login.html';
+		}
+
+		async function loadAssignments() {
+			const rows = await api('/api/assignments');
+			const tbody = document.querySelector('#assignmentsTable tbody');
+			tbody.innerHTML = rows.map(r => {
+				const due = new Date(r.due_at).toLocaleString();
+				return `<tr>
+					<td>${r.title}</td>
+					<td>${due}</td>
+					<td>${r.teacher_name}</td>
+					<td>
+						<form class="uploadForm" data-assignment="${r.id}">
+							<input type="file" name="file" required />
+                            <button type="submit" class="with-icon"><svg class="icon"><use href="#mm-upload"/></svg> Upload</button>
+						</form>
+					</td>
+				</tr>`
+			}).join('');
+
+			for (const form of document.querySelectorAll('.uploadForm')) {
+				form.addEventListener('submit', async (e) => {
+					e.preventDefault();
+					const fd = new FormData(form);
+					fd.append('assignment_id', form.dataset.assignment);
+					fd.append('student_id', currentStudentId);
+					await fetch('/api/submissions', { method:'POST', body: fd });
+					await loadMarks();
+					alert('Uploaded');
+				});
+			}
+		}
+
+		async function loadMarks() {
+			const rows = await api(`/api/marks?student_id=${currentStudentId}`);
+			const tbody = document.querySelector('#marksTable tbody');
+			tbody.innerHTML = rows.map(r => `<tr>
+				<td>${r.title}</td>
+				<td>${new Date(r.due_at).toLocaleDateString()}</td>
+				<td>${r.submitted_at ? new Date(r.submitted_at).toLocaleString() : '-'}</td>
+				<td><span class="badge">${r.marks ?? 'Pending'}</span></td>
+			</tr>`).join('');
+		}
+
+		async function loadAttendance() {
+			const rows = await api(`/api/attendance?student_id=${currentStudentId}`);
+			const tbody = document.querySelector('#attendanceTable tbody');
+			tbody.innerHTML = rows.map(r => `<tr><td>${r.date}</td><td>${r.present ? 'Present' : 'Absent'}</td></tr>`).join('');
+		}
+
+		async function loadTimetable() {
+			const rows = await api('/api/timetable');
+			const tbody = document.querySelector('#timetableTable tbody');
+			tbody.innerHTML = rows.map(r => `<tr><td>${r.day}</td><td>${r.period}</td><td>${r.subject}</td></tr>`).join('');
+			const pdf = await api('/api/timetable/file');
+			document.getElementById('timetablePdf').innerHTML = pdf.file ? `<a href="${API_BASE}${pdf.file}" target="_blank">View latest timetable PDF</a>` : '<span class="badge">No timetable PDF uploaded yet</span>';
+		}
+
+        async function loadProfile() {
+            try {
+                const student = await api(`/api/users/${currentStudentId}`);
+                document.getElementById('profileDetails').innerHTML = `<span class="badge">ID: ${currentStudentId}</span><span class="badge">Name: ${student.name || authName}</span><span class=\"badge accent\">Active</span>`;
+                document.getElementById('userName').textContent = student.name || authName;
+                
+                // Display photo if exists
+                const photoImg = document.getElementById('studentPhoto');
+                if (student.photo_path) {
+                    photoImg.src = `${API_BASE}/uploads/photos/${student.photo_path}`;
+                    photoImg.style.display = 'block';
+                    photoImg.onerror = () => {
+                        photoImg.style.display = 'none';
+                    };
+                } else {
+                    photoImg.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Failed to load profile:', e);
+                document.getElementById('profileDetails').innerHTML = `<span class="badge">ID: ${currentStudentId}</span><span class="badge">Name: ${authName}</span><span class=\"badge accent\">Active</span>`;
+                document.getElementById('userName').textContent = authName;
+            }
+        }
+
+		async function refreshAll(){
+			await Promise.all([loadProfile(), loadAssignments(), loadMarks(), loadAttendance(), loadTimetable()]);
+		}
+
+		document.getElementById('yr').textContent = new Date().getFullYear();
+		loadStudents();
+	</script>
+</body>
+</html>
+
+

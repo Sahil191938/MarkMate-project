@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mark Mate — Teacher Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="mm-logo" viewBox="0 0 24 24"><path d="M12 2L3 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="white" opacity="0.9"/><path d="M10 12l1.5 1.5 3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+        <symbol id="mm-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"/></symbol>
+        <symbol id="mm-student" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0Z"/></symbol>
+        <symbol id="mm-teacher" viewBox="0 0 24 24"><rect x="3" y="4" width="14" height="10" rx="2"/><circle cx="19" cy="18" r="2"/><path d="M17 18h4" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="mm-logout" viewBox="0 0 24 24"><path d="M15 12H4" stroke="currentColor" stroke-width="2"/><path d="M11 8l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+        <symbol id="mm-assign" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v3h3" fill="#000"/></symbol>
+        <symbol id="mm-upload" viewBox="0 0 24 24"><path d="M12 16V7" stroke="currentColor" stroke-width="2"/><path d="M8 10l4-4 4 4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M4 20h16" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="mm-save" viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M7 4v6h10V4"/></symbol>
+        <symbol id="mm-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" stroke-width="2"/></symbol>
+        <symbol id="mm-file" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/></symbol>
+    </svg>
+    <style>
+        .container{max-width:1200px;margin:24px auto;padding:24px}
+        .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+        .card{background:var(--color-surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:12px 0;box-shadow:var(--shadow)}
+        .flex{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    </style>
+</head>
+<body>
+    <div class="headerbar">
+        <div class="headerbar-inner">
+            <div class="brand">
+                <div class="logo"><img src="cu-logo.png" alt="Logo"></div>
+                <div>Mark Mate</div>
+            </div>
+            <div class="nav">
+                <a href="index.html" class="with-icon"><svg class="icon"><use href="#mm-home"/></svg> Home</a>
+                <a href="student.html" class="with-icon"><svg class="icon"><use href="#mm-student"/></svg> Student</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h2>Teacher Dashboard <span class="badge accent">Teacher</span></h2>
+            <div class="flex">
+                <label for="teacherSelect" class="with-icon"><svg class="icon"><use href="#mm-teacher"/></svg> Teacher:</label>
+                <select id="teacherSelect"></select>
+                <span class="badge accent" id="welcomeBadge" style="display:inline-flex;align-items:center;gap:6px"><svg class="icon"><use href="#mm-home"/></svg> Welcome, <span id="userName"></span></span>
+                <button class="btn ghost with-icon" onclick="logout()"><svg class="icon"><use href="#mm-logout"/></svg> Logout</button>
+            </div>
+		</div>
+        <div class="layout">
+            <div class="main">
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-file"/></svg> Add Users</h3>
+                    <form id="addUserForm" class="flex">
+                        <input type="text" name="name" placeholder="Full name" required />
+                        <select name="role">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                        <button type="submit" class="with-icon"><svg class="icon"><use href="#mm-save"/></svg> Add</button>
+                    </form>
+                    <div class="grid">
+                        <div>
+                            <h4>Students</h4>
+                            <ul id="studentsList"></ul>
+                        </div>
+                        <div>
+                            <h4>Teachers</h4>
+                            <ul id="teachersList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-profile"/></svg> Edit Student Details</h3>
+                    <div class="flex" style="margin-bottom:12px">
+                        <label>Select Student:</label>
+                        <select id="editStudentSelect" style="flex:1">
+                            <option value="">-- Select Student to Edit --</option>
+                        </select>
+                    </div>
+                    <form id="editStudentForm" style="display:none">
+                        <div class="flex" style="flex-direction:column;gap:12px">
+                            <div>
+                                <label>Student Photo:</label>
+                                <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+                                    <img id="studentPhotoPreview" src="" alt="No photo" style="width:80px;height:80px;border-radius:8px;object-fit:cover;border:2px solid var(--border);display:none" />
+                                    <input type="file" id="studentPhotoInput" name="photo" accept="image/*" />
+                                </div>
+                            </div>
+                            <div>
+                                <label>Student Name:</label>
+                                <input type="text" id="editStudentName" name="name" placeholder="Full name" required style="width:100%;margin-top:8px" />
+                            </div>
+                            <button type="submit" class="with-icon"><svg class="icon"><use href="#mm-save"/></svg> Update Student</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-assign"/></svg> Create Assignment</h3>
+                    <form id="createAssignmentForm" class="grid">
+                        <input type="text" name="title" placeholder="Title" required />
+                        <input type="datetime-local" name="due_at" required />
+                        <textarea name="description" placeholder="Description"></textarea>
+                        <button type="submit" class="with-icon"><svg class="icon"><use href="#mm-save"/></svg> Create</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-upload"/></svg> Submissions by Assignment</h3>
+                    <div class="flex">
+                        <label>Assignment:</label>
+                        <select id="assignmentSelect"></select>
+                    </div>
+                    <table id="submissionsTable"><thead><tr><th>Student</th><th>Submitted</th><th>File</th><th>Marks</th><th>Action</th></tr></thead><tbody></tbody></table>
+                </div>
+
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-file"/></svg> Time Table</h3>
+                    <form id="timetableForm" class="grid">
+                        <input name="day" placeholder="Day (e.g., Monday)" required />
+                        <input name="period" placeholder="Period (e.g., 9:00-10:00)" required />
+                        <input name="subject" placeholder="Subject" required />
+                            <button id="addEntry" type="button" class="with-icon"><svg class="icon"><use href="#mm-save"/></svg> Add Entry</button>
+                            <button id="saveTimetable" type="button" class="with-icon"><svg class="icon"><use href="#mm-save"/></svg> Save Timetable</button>
+                    </form>
+                    <table id="timetableTable"><thead><tr><th>Day</th><th>Period</th><th>Subject</th><th></th></tr></thead><tbody></tbody></table>
+                    <div class="flex">
+                        <form id="uploadTimetableFile">
+                            <input type="file" name="file" accept="application/pdf" />
+                    <button type="submit" class="with-icon"><svg class="icon"><use href="#mm-file"/></svg> Upload PDF</button>
+                        </form>
+                        <div id="timetableFileLink"></div>
+                    </div>
+                </div>
+            </div>
+            <aside class="sidebar">
+                <div class="card">
+                    <h3 class="with-icon"><svg class="icon icon-20"><use href="#mm-calendar"/></svg> Attendance</h3>
+                    <div class="flex">
+                        <input type="date" id="attendanceDate" />
+                        <button id="saveAttendance" data-icon="💾">Save Attendance</button>
+                    </div>
+                    <table id="attendanceTable"><thead><tr><th>Student</th><th>Present?</th></tr></thead><tbody></tbody></table>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="footerbar">Manage classes efficiently • © <span id="yr"></span></div>
+
+	<script>
+		const API_BASE = (location.protocol === 'file:') ? 'http://localhost:3000' : '';
+		const api = async (p, opt={}) => {
+			try {
+				const response = await fetch(`${API_BASE}${p}`, opt);
+				if (!response.ok) {
+					const error = await response.json().catch(() => ({ error: `HTTP error! status: ${response.status}` }));
+					throw new Error(error.error || `HTTP error! status: ${response.status}`);
+				}
+				return await response.json();
+			} catch (error) {
+				console.error('API Error:', error);
+				throw error;
+			}
+		};
+		
+		// Check authentication
+		const authUserId = localStorage.getItem('auth_user_id');
+		const authRole = localStorage.getItem('auth_role');
+		const authName = localStorage.getItem('auth_name');
+		
+		if (!authUserId || authRole !== 'teacher') {
+			window.location.href = 'login.html';
+		}
+		
+		const teacherSelect = document.getElementById('teacherSelect');
+		const assignmentSelect = document.getElementById('assignmentSelect');
+		let currentTeacherId = authUserId;
+		let timetableEntries = [];
+
+		// Set authenticated teacher and hide dropdown
+		teacherSelect.style.display = 'none';
+		document.querySelector('label[for="teacherSelect"]').style.display = 'none';
+
+		async function loadTeachers(){
+			const t = await api('/api/users?role=teacher');
+			currentTeacherId = authUserId;
+		}
+		
+		// Logout function
+		async function logout() {
+			localStorage.removeItem('auth_user_id');
+			localStorage.removeItem('auth_role');
+			localStorage.removeItem('auth_name');
+			window.location.href = 'login.html';
+		}
+
+		async function loadAssignments(){
+			const a = await api('/api/assignments');
+			assignmentSelect.innerHTML = a.map(x => `<option value="${x.id}">${x.title} (due ${new Date(x.due_at).toLocaleDateString()})</option>`).join('');
+			if (a[0]){
+				assignmentSelect.value = a[0].id;
+				loadSubmissions();
+			}
+		}
+
+		async function loadSubmissions(){
+			const id = assignmentSelect.value;
+			if (!id) return;
+			const rows = await api(`/api/submissions?assignment_id=${id}`);
+			const tbody = document.querySelector('#submissionsTable tbody');
+			tbody.innerHTML = rows.map(r => `<tr>
+				<td>${r.student_name}</td>
+				<td>${new Date(r.submitted_at).toLocaleString()}</td>
+				<td><a href="/api/submissions/${r.id}/download">Download</a></td>
+				<td><input type="number" min="0" max="100" value="${r.marks ?? ''}" data-id="${r.id}" class="markInput" /></td>
+                <td><button data-id="${r.id}" class="saveMark with-icon"><svg class="icon"><use href="#mm-save"/></svg> Save</button></td>
+			</tr>`).join('');
+
+			for (const btn of document.querySelectorAll('.saveMark')){
+				btn.addEventListener('click', async () => {
+					const id = btn.dataset.id;
+					const input = document.querySelector(`input.markInput[data-id="${id}"]`);
+					await api(`/api/submissions/${id}/mark`, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({marks: Number(input.value)})});
+					alert('Marks saved');
+				});
+			}
+		}
+
+		document.getElementById('createAssignmentForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const fd = new FormData(e.target);
+			const body = Object.fromEntries(fd.entries());
+			await api('/api/assignments', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+				title: body.title, description: body.description, due_at: body.due_at, teacher_id: authUserId
+			})});
+			await loadAssignments();
+			alert('Assignment created');
+		});
+
+		assignmentSelect.addEventListener('change', loadSubmissions);
+
+		// Attendance
+		async function loadStudents(){
+			const s = await api('/api/users?role=student');
+			const tbody = document.querySelector('#attendanceTable tbody');
+			tbody.innerHTML = s.map(x => `<tr><td>${x.name}</td><td><input type="checkbox" data-student="${x.id}" /></td></tr>`).join('');
+		}
+
+		document.getElementById('saveAttendance').addEventListener('click', async () => {
+			const date = document.getElementById('attendanceDate').value;
+			if (!date) return alert('Pick a date');
+			const marks = Array.from(document.querySelectorAll('#attendanceTable input[type="checkbox"]')).map(chk => ({student_id: Number(chk.dataset.student), present: chk.checked}));
+			await api('/api/attendance/mark', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({date, marks})});
+			alert('Attendance saved');
+		});
+
+		// Timetable build
+		const timetableBody = document.querySelector('#timetableTable tbody');
+		document.getElementById('addEntry').addEventListener('click', () => {
+			const form = document.getElementById('timetableForm');
+			const day = form.day.value.trim();
+			const period = form.period.value.trim();
+			const subject = form.subject.value.trim();
+			if (!day || !period || !subject) return;
+			timetableEntries.push({day, period, subject});
+			renderTimetable();
+			form.reset();
+		});
+
+		function renderTimetable(){
+			timetableBody.innerHTML = timetableEntries.map((e, i) => `<tr><td>${e.day}</td><td>${e.period}</td><td>${e.subject}</td><td><button data-i="${i}" class="delEntry">Delete</button></td></tr>`).join('');
+			for (const b of document.querySelectorAll('.delEntry')){
+				b.addEventListener('click', () => {
+					const i = Number(b.dataset.i);
+					timetableEntries.splice(i,1);
+					renderTimetable();
+				});
+			}
+		}
+
+		document.getElementById('saveTimetable').addEventListener('click', async () => {
+			await api('/api/timetable', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ entries: timetableEntries, teacher_id: authUserId })});
+			alert('Timetable saved');
+		});
+
+		document.getElementById('uploadTimetableFile').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const fd = new FormData(e.target);
+			const res = await fetch('/api/timetable/upload', { method:'POST', body: fd });
+			const js = await res.json();
+			if (js.file){
+				document.getElementById('timetableFileLink').innerHTML = `<a href="${js.file}" target="_blank">View PDF</a>`;
+			}
+		});
+
+		document.getElementById('userName').textContent = authName;
+		Promise.all([loadTeachers(), loadAssignments(), loadStudents()]);
+		document.getElementById('yr').textContent = new Date().getFullYear();
+
+		// User management
+		async function refreshUserLists(){
+			const [students, teachers] = await Promise.all([
+				api('/api/users?role=student'), api('/api/users?role=teacher')
+			]);
+			document.getElementById('studentsList').innerHTML = students.map(u => `<li>${u.name} <span style="color:#6b7280">(#${u.id})</span></li>`).join('');
+			document.getElementById('teachersList').innerHTML = teachers.map(u => `<li>${u.name} <span style="color:#6b7280">(#${u.id})</span></li>`).join('');
+			
+			// Populate edit student dropdown
+			const editSelect = document.getElementById('editStudentSelect');
+			editSelect.innerHTML = '<option value="">-- Select Student to Edit --</option>' +
+				students.map(u => `<option value="${u.id}">${u.name} (#${u.id})</option>`).join('');
+		}
+		
+		// Load student details for editing
+		document.getElementById('editStudentSelect').addEventListener('change', async () => {
+			const studentId = document.getElementById('editStudentSelect').value;
+			const editForm = document.getElementById('editStudentForm');
+			const photoPreview = document.getElementById('studentPhotoPreview');
+			
+			if (!studentId) {
+				editForm.style.display = 'none';
+				return;
+			}
+			
+			try {
+				const student = await api(`/api/users/${studentId}`);
+				if (student && student.id) {
+					document.getElementById('editStudentName').value = student.name || '';
+					
+					// Show photo if exists
+					if (student.photo_path) {
+						photoPreview.src = `${API_BASE}/uploads/photos/${student.photo_path}`;
+						photoPreview.style.display = 'block';
+						photoPreview.onerror = () => {
+							photoPreview.style.display = 'none';
+						};
+					} else {
+						photoPreview.style.display = 'none';
+					}
+					
+					editForm.style.display = 'block';
+				} else {
+					throw new Error('Invalid student data received');
+				}
+			} catch (e) {
+				console.error('Failed to load student:', e);
+				alert(`Failed to load student details: ${e.message || 'Unknown error'}`);
+				editForm.style.display = 'none';
+			}
+		});
+		
+		// Photo preview
+		document.getElementById('studentPhotoInput').addEventListener('change', (e) => {
+			const file = e.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (event) => {
+					document.getElementById('studentPhotoPreview').src = event.target.result;
+					document.getElementById('studentPhotoPreview').style.display = 'block';
+				};
+				reader.readAsDataURL(file);
+			}
+		});
+		
+		// Submit edit student form
+		document.getElementById('editStudentForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const studentId = document.getElementById('editStudentSelect').value;
+			const formData = new FormData();
+			
+			formData.append('name', document.getElementById('editStudentName').value);
+			
+			const photoFile = document.getElementById('studentPhotoInput').files[0];
+			if (photoFile) {
+				formData.append('photo', photoFile);
+			}
+			
+			try {
+				const response = await fetch(`${API_BASE}/api/users/${studentId}`, {
+					method: 'PUT',
+					body: formData
+				});
+				
+				if (response.ok) {
+					const updated = await response.json();
+					alert('Student updated successfully!');
+					// Clear photo input
+					document.getElementById('studentPhotoInput').value = '';
+					await refreshUserLists();
+					await loadStudents(); // Refresh attendance list
+					// Reload student details to show updated photo
+					const currentId = document.getElementById('editStudentSelect').value;
+					if (currentId) {
+						document.getElementById('editStudentSelect').dispatchEvent(new Event('change'));
+					}
+				} else {
+					const error = await response.json();
+					alert(error.error || 'Failed to update student');
+				}
+			} catch (e) {
+				console.error('Update error:', e);
+				alert('Failed to update student');
+			}
+		});
+
+		document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const fd = new FormData(e.target);
+			const body = Object.fromEntries(fd.entries());
+			const user = await api('/api/users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: body.name, role: body.role })});
+			await refreshUserLists();
+			if (user.role === 'teacher') await loadTeachers();
+			if (user.role === 'student') await loadStudents();
+			e.target.reset();
+		});
+
+		refreshUserLists();
+	</script>
+</body>
+</html>
+
+
